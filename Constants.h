@@ -1,11 +1,7 @@
 #include <string>
 #pragma once
 using namespace std;
-enum DATATYPE
-{
-	Social,
-	Sensor
-};
+
 enum ALG
 {
 	aDFS,
