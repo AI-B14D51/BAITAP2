@@ -30,88 +30,6 @@ vector<double> Delta_vals = {1};
 
 Network *g;
 
-void run_experiments(uint no_nodes, string file, bool is_directed, bool is_random = false)
-{
-	long folder_prefix = time(NULL);
-	string re_folder = "result/" + to_string(folder_prefix) + "_" + (is_random ? "random" : file) + "_" + (is_directed ? "directed" : "undirected");
-
-	g = new Network();
-
-	g->read_sensor_data(no_nodes, "data/" + file);
-
-#if defined(_WIN32)
-	mkdir(re_folder.c_str());
-#else
-	mkdir(re_folder.c_str(), 0777); // notice that 777 is different than 0777
-#endif
-
-	string sol_output_file = re_folder + "/result.csv";
-	string query_output_file = re_folder + "/query.csv";
-	ofstream sol_writefile(sol_output_file), query_writefile(query_output_file);
-	if (sol_writefile.is_open() && query_writefile.is_open())
-	{
-		// header
-		if (is_random)
-		{
-			sol_writefile << "p,";
-			query_writefile << "p,";
-		}
-		sol_writefile << "B,";
-		query_writefile << "B,";
-
-		for (uint m : M_vals)
-		{
-			for (double d : Delta_vals)
-			{
-				sol_writefile << "ra_" << m << "_" << d << ",";
-				query_writefile << "ra_" << m << "_" << d << ",";
-			}
-		}
-
-		sol_writefile << endl;
-
-		query_writefile << endl;
-
-		// body content
-		if (!is_random)
-		{
-			for (uint b : B_vals)
-			{
-				Constants::BUDGET = b;
-				sol_writefile << Constants::BUDGET << ",";
-				query_writefile << Constants::BUDGET << ",";
-				cout << "B " << b << " K " << Constants::K << endl;
-
-				for (uint m : M_vals)
-				{
-					for (double d : Delta_vals)
-					{
-						Constants::M = m;
-						Constants::DELTA = d;
-
-						Constants::NO_DENOISE_STEPS = 2;
-						Randomized *ra = new Randomized(g);
-						double ra_sol = ra->get_solution(false);
-						sol_writefile << ra_sol << ",";
-						query_writefile << ra->get_no_queries() << ",";
-						cout << "ra_" << m << "_" << d << ": " << ra_sol << " " << ra->get_no_queries() << endl;
-						delete ra;
-					}
-				}
-
-				sol_writefile << endl;
-				query_writefile << endl;
-
-				cout << "--------------------------------------------------" << endl;
-			}
-		}
-
-		sol_writefile.close();
-		query_writefile.close();
-	}
-	delete g;
-}
-
 void print_help()
 {
 	cout << "Options: " << endl;
@@ -161,19 +79,7 @@ pair<string, int> parseArgs(int argc, char **argv)
 				no_nodes = val;
 				Constants::n_nodes = val;
 			}
-			else if (arg == "-k")
-			{
-				Constants::K = val;
-			}
-			else if (arg == "-B")
-			{
-				Constants::BUDGET = val;
-			}
 
-			else if (arg == "-M")
-			{
-				Constants::M = val;
-			}
 			else if (arg == "-a")
 			{
 				switch (val)
@@ -184,17 +90,11 @@ pair<string, int> parseArgs(int argc, char **argv)
 				case 1:
 					Constants::ALGORITHM = aBFS;
 					break;
-				case 2:
-					Constants::ALGORITHM = aIDS;
-					break;
-				case 3:
-					Constants::ALGORITHM = aUCS;
-					break;
 				case 4:
 					Constants::ALGORITHM = abestFS;
 					break;
 				default:
-					Constants::ALGORITHM = aDFS;
+					Constants::ALGORITHM = aBFS;
 					break;
 				}
 			}
@@ -248,20 +148,6 @@ void run_command(string filename, int no_nodes)
 			BFS *bfs = new BFS(g);
 			bfs->get_solution();
 			delete bfs;
-			break;
-		}
-		case aIDS:
-		{
-			IDS *ids = new IDS(g);
-			ids->get_solution();
-			delete ids;
-			break;
-		}
-		case aUCS:
-		{
-			UCS *ucs = new UCS(g);
-			ucs->get_solution();
-			delete ucs;
 			break;
 		}
 		case abestFS:
