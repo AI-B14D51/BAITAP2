@@ -7,6 +7,12 @@
 
 #include "Network.h"
 #include "Constants.h"
+#include "Greedy.h"
+#include "Deterministic.h"
+#include "Randomized.h"
+#include "Degree.h"
+#include "SingleGreedy.h"
+#include "StreamingGreedy.h"
 #include "DFS.h"
 #include "BFS.h"
 #include "bestFS.h"
@@ -24,9 +30,15 @@ using namespace std;
 
 #pragma warning(disable : 4996)
 vector<uint> B_vals = {15, 20, 25, 30, 35, 40, 45, 50};
+// vector<uint> B_vals = { 50 };
+//  for sensor
+// vector<uint> B_vals = { 5,6,7,8,9,10,11,12,13,14,15 };
 
+// vector<uint> M_vals = {3,4,5};
 vector<uint> M_vals = {3};
 vector<double> Delta_vals = {1};
+// vector<double> Delta_vals = { 0.5,1.0,1.5};
+// vector<double> Delta_vals = { 1.5, 2.0, 3.0 };
 
 Network *g;
 
@@ -51,6 +63,11 @@ pair<string, int> parseArgs(int argc, char **argv)
 	string filename = "error";
 	int no_nodes = 50;
 
+	/*if (argc == 1) {
+		print_help();
+		return pair<string,int>(filename, no_nodes);
+	}*/
+
 	int i = 1;
 	while (i < argc - 1)
 	{
@@ -74,12 +91,40 @@ pair<string, int> parseArgs(int argc, char **argv)
 			string s_val = argv[i + 1];
 			std::string::size_type sz;
 			int val = std::stoi(s_val, &sz);
+			if (arg == "-t")
+			{
+				Constants::DATA = val == 0 ? Social : Sensor;
+				if (Constants::DATA == Sensor)
+				{
+					Constants::EPS = 0;
+					Constants::NO_DENOISE_STEPS = 1;
+				}
+			}
 			else if (arg == "-V")
 			{
 				no_nodes = val;
 				Constants::n_nodes = val;
 			}
-
+			else if (arg == "-k")
+			{
+				Constants::K = val;
+			}
+			else if (arg == "-B")
+			{
+				Constants::BUDGET = val;
+			}
+			else if (arg == "-n")
+			{
+				Constants::NO_DENOISE_STEPS = val;
+				if (Constants::DATA == Sensor)
+				{
+					Constants::NO_DENOISE_STEPS = 1;
+				}
+			}
+			else if (arg == "-M")
+			{
+				Constants::M = val;
+			}
 			else if (arg == "-a")
 			{
 				switch (val)
@@ -90,11 +135,11 @@ pair<string, int> parseArgs(int argc, char **argv)
 				case 1:
 					Constants::ALGORITHM = aBFS;
 					break;
-				case 4:
+				case 2:
 					Constants::ALGORITHM = abestFS;
 					break;
 				default:
-					Constants::ALGORITHM = aBFS;
+					Constants::ALGORITHM = aDFS;
 					break;
 				}
 			}
@@ -117,12 +162,19 @@ pair<string, int> parseArgs(int argc, char **argv)
 		}
 		i += 2;
 	}
+	// cout << Constants::start << " " << Constants::end << " " << Constants::ALGORITHM;
 	return pair<string, int>(filename, no_nodes);
 }
 
 void run_command(string filename, int no_nodes)
 {
 	Network *g = new Network();
+	// bool r = false;
+	// if (Constants::DATA == Social) {
+	// 	r = g->read_network_from_file(no_nodes, filename, false);
+	// }
+	// else
+	// 	r = g->read_sensor_data(no_nodes, filename);
 
 	if (false)
 	{
@@ -159,12 +211,15 @@ void run_command(string filename, int no_nodes)
 		}
 		default:
 		{
-			BFS *bfs = new BFS(g);
-			bfs->get_solution();
-			delete bfs;
+			DFS *dfs = new DFS(g);
+			dfs->get_solution();
+			delete dfs;
 			break;
 		}
 		}
+		// if (Constants::DATA == Sensor) sol = sol / 100;
+		// cout << "Output: " << sol << endl
+		// 	<< "Number of queries: " << no_queries << endl;
 	}
 	delete g;
 }

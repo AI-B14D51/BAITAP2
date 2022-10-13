@@ -21,6 +21,7 @@ int length_road = INT32_MAX;
 vector<int> graph[max];
 vector<int> mark;
 vector<int> result;
+bool visited[max];
 int matrix[max][max];
 
 void DFS::input_dfs(string filein)
@@ -59,7 +60,7 @@ void DFS::dfs_execute(int vt, int destination)
             visited[v] = true;
             if (v == destination)
             {
-                int distance = sum_of_mark();
+                int distance = sum_of_mark(destination);
                 if (length_road > distance)
                 {
                     length_road = distance;
@@ -70,7 +71,7 @@ void DFS::dfs_execute(int vt, int destination)
             else
             {
                 mark.push_back(v);
-                dfs(v);
+                dfs_execute(v,destination);
                 visited[v] = false;
                 mark.pop_back();
             }

@@ -26,10 +26,10 @@ void bestFS::input_BestFS(string filein)
     fin.open(filein, ios::in);
     while (!fin.eof())
     {
-        int u, v, w;
-        fin >> u >> v >> w;
-        graphBest[x].push_back(make_pair(w, y));
-        graphBest[y].push_back(make_pair(w, x));
+        int x, y, z;
+        fin >> x >> y >> z;
+        graphBest[x].push_back(make_pair(y,z));
+        graphBest[y].push_back(make_pair(x,z));
     }
     fin.close();
 }
@@ -74,7 +74,7 @@ double bestFS::get_solution(bool is_ds)
     fout << "Best First Search" << endl;
     fout.close();
     input_BestFS(Constants::FILEIN);
-    best_first_search(Constants::start, Constants::end);
+    best_first_search(Constants::start, Constants::end, Constants::n_nodes);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fout.open("output.out", ios::out | ios::trunc);

@@ -42,7 +42,7 @@ void BFS::input_bfs(string filein)
     fin.close();
 }
 
-void BFS::print_dfs(int begin, int destination)
+void BFS::print_bfs(int begin, int destination)
 {
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
@@ -66,7 +66,7 @@ void BFS::print_dfs(int begin, int destination)
     fout.close();
 }
 
-void BFS::bfs_execute(int root)
+void BFS::bfs_execute(int root, int n)
 {
     priority_queue<ii, vector<ii>, greater<ii>> road;
     for (int i = 0; i <= n; i++)
@@ -79,14 +79,14 @@ void BFS::bfs_execute(int root)
     {
         ii top = road.top();
         road.pop();
-        int u = top.fi;
-        if (d[u] != top.se)
+        int u = top.first;
+        if (d[u] != top.second)
             continue;
 
-        for (int i = 0; i < graph[u].size(); i++)
+        for (int i = 0; i < graphbfs[u].size(); i++)
         {
-            int v = graphbfs[u][i].fi;
-            int uv = graphbfs[u][i].se;
+            int v = graphbfs[u][i].first;
+            int uv = graphbfs[u][i].second;
             if (d[v] > d[u] + uv)
             {
                 d[v] = d[u] + uv;
@@ -102,8 +102,8 @@ void BFS::run_bfs(string filein, int begin, int destination)
 
     clock_t start = clock();
     input_bfs(filein);
-    bfs_execute(begin);
-    print_dfs(begin, destination);
+    bfs_execute(begin, Constants::n_nodes);
+    print_bfs(begin, destination);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     fstream fout;
