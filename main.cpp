@@ -9,8 +9,6 @@
 #include "Constants.h"
 #include "DFS.h"
 #include "BFS.h"
-#include "IDS.h"
-#include "UCS.h"
 #include "bestFS.h"
 
 //#include <time.h>
