@@ -1,12 +1,17 @@
 #pragma once
 #include "Framework.h"
 
-class bestFS : public Framework
+class BestFS: public Framework
 {
 public:
-    bestFS(Network *g);
-    ~bestFS();
-    double get_solution(bool is_ds = true);
-    void input_BestFS(string filein);
-    void best_first_search(int actual, int target, int n);
+	BestFS(Network * g);
+	~BestFS();
+	double get_solution(bool is_ds = true);
+	void InitBestFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix);
+	int sumOfMark(vector<vector<int>> Matrix);
+	void alg_BestFS(int n, int u, int t, vector<vector<int>> Matrix);
+	void ResultBestFS(int s, int t);
+	void runBestFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix);
+	//int trongsomin;
 };
+

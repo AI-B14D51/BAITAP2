@@ -1,89 +1,130 @@
-#include <iostream>
+#include<iostream>
 #include <iostream>
 #include <fstream>
 #include <time.h>
 #include <vector>
-#include <queue>
-#include "bestFS.h"
+#include "BestFS.h"
 #include "Constants.h"
+
 #include "memory.h"
 using namespace std;
 
-bestFS::bestFS(Network *g) : Framework(g)
+BestFS::BestFS(Network * g) : Framework(g)
 {
 }
 
-bestFS::~bestFS()
+BestFS::~BestFS()
 {
 }
 
-typedef pair<int, int> ii;
-vector<vector<ii>> graphBest;
+#define MAX 100
+int dMin2 = 1e8;                   // đường đi ngắn nhất BestFS
+vector<bool> visited2(MAX, false); // các đỉnh đã ghé thăm BestFS
+vector<int> mark2, res2;            // Lưu vết đường đi
+vector<int> trongso2={20,10,5,0,30,12,16,25,24,22,16,11,19,10,8,15,17,18,19,20};
 
-void bestFS::input_BestFS(string filein)
+void BestFS::InitBestFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix)
 {
     fstream fin;
     fin.open(filein, ios::in);
+    Matrix = vector<vector<int>>(MAX, vector<int>(MAX, 0));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            Matrix[i][j] = 0;
     while (!fin.eof())
     {
-        int u, v, w;
-        fin >> u >> v >> w;
-        graphBest[x].push_back(make_pair(w, y));
-        graphBest[y].push_back(make_pair(w, x));
+        int u, v;
+        fin >> u >> v;
+        Matrix[u][v] = 1;
+        Matrix[v][u] = 1;
     }
     fin.close();
 }
 
-void bestFS::best_first_search(int actual, int target, int n)
+int BestFS::sumOfMark(vector<vector<int>> Matrix)
 {
-    fstream fout;
-    fout.open("output.out", ios::out | ios::trunc);
-    fout << "Path: ";
-    vector<bool> visited(n, false);
-
-    priority_queue<ii, vector<ii>, greater<ii>> pq;
-    pq.push(make_pair(0, actual));
-    int s = actual;
-    visited[s] = true;
-    while (!pq.empty())
+    int res = 0;
+    for (int i = 0; i < mark2.size() - 1; i++)
     {
-        int x = pq.top().second;
+        res += trongso2[i];
+    }
+    return res;
+}
 
-        fout << x << " ";
-        pq.pop();
-        if (x == target)
-            break;
-
-        for (int i = 0; i < graphBest[x].size(); i++)
-        {
-            if (!visited[graphBest[x][i].second])
-            {
-                visited[graphBest[x][i].second] = true;
-                pq.push(make_pair(graphBest[x][i].first, graphBest[x][i].second));
+void BestFS::alg_BestFS(int n, int u, int t, vector<vector<int>> Matrix)
+{
+    int trongsomin=100;
+    for (int i = 0; i < n; i++)
+    {
+        if(!visited2[i] && Matrix[u][i]&&trongso2[i]< trongsomin){
+            trongsomin=trongso2[i];
             }
+    for (int i = 0; i < n; i++)
+    {
+        if(!visited2[i] && Matrix[u][i]&&trongso2[i]== trongsomin){
+            mark2.push_back(i);
+            visited2[i] = true;
+            if (i == t)
+            {
+                if (sumOfMark(Matrix) < dMin2)
+                {
+                    dMin2 = sumOfMark(Matrix);
+                    res2 = mark2;
+                }
+                break;
+                mark2.pop_back();
+                visited2[i] = false;
+
+            }
+            else
+            {
+                alg_BestFS(n, i, t, Matrix);
+                mark2.pop_back();
+                visited2[i] = false;
+            }
+            }
+
         }
     }
+}
+
+void BestFS::ResultBestFS(int s, int t){
+    fstream fout;
+    fout.open("output.out", ios::out | ios::trunc);
+    fout << "BestFS\n";
+    fout << "Duong di ngan nhat tu " << s << " den " << t << " la:" << endl;
+    for (int i = 0; i < res2.size() - 1; i++)
+    {
+        fout << res2[i] << "=>";
+    }
+    fout << res2[res2.size() - 1];
+    fout << endl;
+    fout << "Do dai duong di la : ";
+    fout << dMin2;
+    double vm, rss;
+    process_mem_usage(vm, rss);
+    fout << "\nMemory: " << "VM: " << vm << " KB" << "; RSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-double bestFS::get_solution(bool is_ds)
-{
+void BestFS::runBestFS(string filein, int n, int s, int t, vector<vector<int>> &Matrix) {
     clock_t start = clock();
-    fstream fout;
-    fout.open("output.out", ios::out | ios::trunc);
-    fout << "Best First Search" << endl;
-    fout.close();
-    input_BestFS(Constants::FILEIN);
-    best_first_search(Constants::start, Constants::end);
+    InitBestFS(filein, n, s, t, Matrix);
+    mark2.push_back(s);
+    visited2[s] = true;
+    alg_BestFS(n, s, t, Matrix);
+    ResultBestFS(s, t);
     clock_t end = clock();
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
-    fout.open("output.out", ios::out | ios::trunc);
-    fout << "Time taken by best first search is: " << time_taken * 1000 << " miliseconds" << endl;
-    double vm, rss;
-    process_mem_usage(vm, rss);
-    fout << "Memory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fstream fout;
+    fout.open("output.out", ios::app);
+    fout << "thoi gian: " << time_taken * 1000 << " miliseconds";
     fout.close();
-    return 0.0;
+}
+
+double BestFS::get_solution(bool is_ds)
+{
+	vector<vector<int>> Matrix;
+    runBestFS(Constants::FILEIN, Constants::n_nodes, Constants::start, Constants::end, Matrix);
+	return 0.0;
 }
