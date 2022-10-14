@@ -18,7 +18,7 @@ bestFS::~bestFS()
 }
 
 typedef pair<int, int> ii;
-vector<vector<ii>> graphBest;
+vector<vector<ii>> grpBest;
 
 void bestFS::input_BestFS(string filein)
 {
@@ -28,8 +28,8 @@ void bestFS::input_BestFS(string filein)
     {
         int x, y, z;
         fin >> x >> y >> z;
-        graphBest[x].push_back(make_pair(y,z));
-        graphBest[y].push_back(make_pair(x,z));
+        grpBest[x].push_back(make_pair(y,z));
+        grpBest[y].push_back(make_pair(x,z));
     }
     fin.close();
 }
@@ -38,52 +38,55 @@ void bestFS::best_first_search(int actual, int target, int n)
 {
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "Path: ";
+    fout << "Duong di: ";
     vector<bool> visited(n, false);
 
-    priority_queue<ii, vector<ii>, greater<ii>> pq;
-    pq.push(make_pair(0, actual));
+    priority_queue<ii, vector<ii>, greater<ii>> prQueue;
+    prQueue.push(make_pair(0, actual));
     int s = actual;
     visited[s] = true;
-    while (!pq.empty())
+    while (!prQueue.empty())
     {
-        int x = pq.top().second;
+        int x = prQueue.top().second;
 
-        fout << x << " ";
-        pq.pop();
+        fout << x << " => ";
+        prQueue.pop();
         if (x == target)
             break;
 
-        for (int i = 0; i < graphBest[x].size(); i++)
+        for (int i = 0; i < grpBest[x].size(); i++)
         {
-            if (!visited[graphBest[x][i].second])
+            if (!visited[grpBest[x][i].second])
             {
-                visited[graphBest[x][i].second] = true;
-                pq.push(make_pair(graphBest[x][i].first, graphBest[x][i].second));
+                visited[grpBest[x][i].second] = true;
+                prQueue.push(make_pair(grpBest[x][i].first, grpBest[x][i].second));
             }
         }
     }
     fout.close();
 }
 
-double bestFS::get_solution(bool is_ds)
+double bestFS::Time_Memory(bool is_ds)
 {
     clock_t start = clock();
+    
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
     fout << "Best First Search" << endl;
     fout.close();
+    
     input_BestFS(Constants::FILEIN);
     best_first_search(Constants::start, Constants::end, Constants::n_nodes);
-    clock_t end = clock();
-    double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+    
+    clock_t stop = clock();
+    double time = ((double)(stop - start)) / CLOCKS_PER_SEC;
     fout.open("output.out", ios::out | ios::trunc);
-    fout << "Time taken by best first search is: " << time_taken * 1000 << " miliseconds" << endl;
-    double vm, rss;
+    fout << "Thoi gian Best FS: " << time * 1000 << " miliseconds" << endl;
+    
+	double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "Memory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fout << "Memory Best FS: "<< "VM: " << vm << " KB"<< "; RSS: " << rss << "KB" << endl;
     fout.close();
+    
     return 0.0;
 }

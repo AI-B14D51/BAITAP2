@@ -6,9 +6,9 @@ class BFS : public Framework
 public:
 	BFS(Network *g);
 	~BFS();
-	double get_solution(bool is_ds = true);
-	void input_bfs(string filein);
-	void print_bfs(int begin, int destination);
-	void bfs_execute(int root, int n);
-	void run_bfs(string filein, int begin, int destination);
+	double Time_Memory(bool is_ds = true);
+	void Input_BFS(string filein);
+	void Print_BFS(int begin, int end);
+	void BFS_exe(int root, int n);
+	void Run_BFS(string filein, int begin, int end);
 };

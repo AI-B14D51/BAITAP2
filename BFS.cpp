@@ -23,12 +23,12 @@ BFS::~BFS()
 #define maxr 9999999
 
 typedef pair<int, int> ii;
-vector<ii> graphbfs[max];
+vector<ii> grpBFS[max];
 int d[max];
 
 int check[max];
 
-void BFS::input_bfs(string filein)
+void BFS::Input_BFS(string filein)
 {
     fstream fin;
     fin.open(filein, ios::in);
@@ -36,20 +36,20 @@ void BFS::input_bfs(string filein)
     {
         int u, v, w;
         fin >> u >> v >> w;
-        graphbfs[u].push_back(make_pair(v, w));
-        graphbfs[v].push_back(make_pair(u, w));
+        grpBFS[u].push_back(make_pair(v, w));
+        grpBFS[v].push_back(make_pair(u, w));
     }
     fin.close();
 }
 
-void BFS::print_bfs(int begin, int destination)
+void BFS::Print_BFS(int begin, int end)
 {
     fstream fout;
     fout.open("output.out", ios::out | ios::trunc);
     fout << "BFS\n";
-    fout << "Path : " << endl;
-    fout << destination << " <= ";
-    int i = check[destination];
+    fout << "Duong di : " << endl;
+    fout << end << " <= ";
+    int i = check[end];
     while (i != begin)
     {
         fout << i << " <= ";
@@ -57,16 +57,15 @@ void BFS::print_bfs(int begin, int destination)
     }
     fout << begin;
     fout << endl
-         << "Length : " << d[destination] << endl;
+         << "Do dai duong di : " << d[end] << endl;
+         
     double vm, rss;
     process_mem_usage(vm, rss);
-    fout << "\nMemory: "
-         << "VM: " << vm << " KB"
-         << "; RSS: " << rss << "KB" << endl;
+    fout << "\nMemory BFS: "<< "VM: " << vm << " KB"<< "; RSS: " << rss << "KB" << endl;
     fout.close();
 }
 
-void BFS::bfs_execute(int root, int n)
+void BFS::BFS_exe(int root, int n)
 {
     priority_queue<ii, vector<ii>, greater<ii>> road;
     for (int i = 0; i <= n; i++)
@@ -83,10 +82,10 @@ void BFS::bfs_execute(int root, int n)
         if (d[u] != top.second)
             continue;
 
-        for (int i = 0; i < graphbfs[u].size(); i++)
+        for (int i = 0; i < grpBFS[u].size(); i++)
         {
-            int v = graphbfs[u][i].first;
-            int uv = graphbfs[u][i].second;
+            int v = grpBFS[u][i].first;
+            int uv = grpBFS[u][i].second;
             if (d[v] > d[u] + uv)
             {
                 d[v] = d[u] + uv;
@@ -97,24 +96,25 @@ void BFS::bfs_execute(int root, int n)
     }
 }
 
-void BFS::run_bfs(string filein, int begin, int destination)
+void BFS::Run_BFS(string filein, int begin, int end)
 {
 
     clock_t start = clock();
-    input_bfs(filein);
-    bfs_execute(begin, Constants::n_nodes);
-    print_bfs(begin, destination);
-    clock_t end = clock();
-    double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+    Input_BFS(filein);
+    BFS_exe(begin, Constants::n_nodes);
+    Print_BFS(begin, end);
+    clock_t stop = clock();
+    
+    double time = ((double)(stop - start)) / CLOCKS_PER_SEC;
     fstream fout;
     fout.open("output.out", ios::app);
-    fout << "Time taken by bfs: " << time_taken * 1000 << " miliseconds";
+    fout << "Thoi gian BFS: " << time * 1000 << " miliseconds";
     fout.close();
 }
 
-double BFS::get_solution(bool is_ds)
+double BFS::Time_Memory(bool is_ds)
 {
 
-    run_bfs(Constants::FILEIN, Constants::start, Constants::end);
+    Run_BFS(Constants::FILEIN, Constants::start, Constants::end);
     return 0.0;
 }

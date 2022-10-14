@@ -6,7 +6,7 @@ class bestFS : public Framework
 public:
     bestFS(Network *g);
     ~bestFS();
-    double get_solution(bool is_ds = true);
+    double Time_Memory(bool is_ds = true);
     void input_BestFS(string filein);
     void best_first_search(int actual, int target, int n);
 };

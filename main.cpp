@@ -30,15 +30,12 @@ using namespace std;
 
 #pragma warning(disable : 4996)
 vector<uint> B_vals = {15, 20, 25, 30, 35, 40, 45, 50};
-// vector<uint> B_vals = { 50 };
-//  for sensor
-// vector<uint> B_vals = { 5,6,7,8,9,10,11,12,13,14,15 };
 
-// vector<uint> M_vals = {3,4,5};
-vector<uint> M_vals = {3};
-vector<double> Delta_vals = {1};
-// vector<double> Delta_vals = { 0.5,1.0,1.5};
-// vector<double> Delta_vals = { 1.5, 2.0, 3.0 };
+
+vector<uint> M_vals = {3,4,5};
+
+vector<double> Delta_vals = { 0.5,1.0,1.5};
+
 
 Network *g;
 
@@ -49,12 +46,12 @@ void print_help()
 		 << "-V <size of V> # default: 50" << endl
 		 << "-t <type of experiment, 0: influence maximization, 1: sensor placement> # default: 0" << endl
 		 << "-k <value of k> # default: 3" << endl
-		 << "-B <value of B> # default: 10" << endl
+		 << "-B <value of B> # default: 15" << endl
 		 << "-M <value of M> # default: 3" << endl
 		 << "-e <value of epsilon> # default: 0.5 for IM and 0 for sensor placement" << endl
 		 << "-n <value of eta - denoise step for RStream> # default: 2" << endl
 		 << "-g <value of gamma> # default: 1.0" << endl
-		 << "-a <algorithm, 0: greedy, 1: DStream, 2: RStream, 3: SGr>  # default: 1, please use SSA source code for testing IM algorithm" << endl
+		 << "-a <algorithm, 0: DFS, 1: BFS, 2: BestFS, 3: SGr>  # default: 1, please use SSA source code for testing IM algorithm" << endl
 		 << "-p <number of threads to running algorithms> # default: 4" << endl;
 }
 
@@ -191,28 +188,28 @@ void run_command(string filename, int no_nodes)
 		case aDFS:
 		{
 			DFS *dfs = new DFS(g);
-			dfs->get_solution();
+			dfs->Time_Memory();
 			delete dfs;
 			break;
 		}
 		case aBFS:
 		{
 			BFS *bfs = new BFS(g);
-			bfs->get_solution();
+			bfs->Time_Memory();
 			delete bfs;
 			break;
 		}
 		case abestFS:
 		{
 			bestFS *bestfs = new bestFS(g);
-			bestfs->get_solution();
+			bestfs->Time_Memory();
 			delete bestfs;
 			break;
 		}
 		default:
 		{
 			DFS *dfs = new DFS(g);
-			dfs->get_solution();
+			dfs->Time_Memory();
 			delete dfs;
 			break;
 		}
