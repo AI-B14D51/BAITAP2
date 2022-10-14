@@ -7,12 +7,6 @@
 
 #include "Network.h"
 #include "Constants.h"
-#include "Greedy.h"
-#include "Deterministic.h"
-#include "Randomized.h"
-#include "Degree.h"
-#include "SingleGreedy.h"
-#include "StreamingGreedy.h"
 #include "DFS.h"
 #include "BFS.h"
 #include "bestFS.h"
