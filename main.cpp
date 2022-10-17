@@ -5,13 +5,19 @@
 #include <stdlib.h>
 #include <string>
 
-#include "Deterministic.h"
-#include "Randomized.h"
 #include "Network.h"
 #include "Constants.h"
+#include "Greedy.h"
+#include "Deterministic.h"
+#include "Randomized.h"
+#include "Degree.h"
+#include "SingleGreedy.h"
+#include "StreamingGreedy.h"
 #include "DFS.h"
 #include "BFS.h"
-#include "BestFS.h"
+#include "IDS.h"
+#include "UCS.h"
+#include "bestFS.h"
 
 //#include <time.h>
 #include <chrono>
@@ -75,9 +81,20 @@ void run_experiments(uint no_nodes, string file, bool is_directed, bool is_rando
 			for (double d : Delta_vals) {
 				sol_writefile << "ra_" << m << "_" << d << ",";
 				query_writefile << "ra_" << m << "_" << d << ",";
+				/*sol_writefile << "de_" << m << "_" << d << ",";
+				query_writefile << "de_" << m << "_" << d << ",";*/
+				/*sol_writefile << "de_" << m << "_" << d << "," << "ra_" << m << "_" << d << ",";
+				query_writefile << "de_" << m << "_" << d << "," << "ra_" << m << "_" << d << ",";*/
 			}
 		}
 		
+		//sol_writefile << "gr,";
+
+		/*
+		for (int ii = 0; ii < Constants::K; ++ii) {
+			sol_writefile << "sg_" << ii << ",";
+		}*/
+		//sol_writefile << "s_gr,";
 		
 		sol_writefile << endl;
 		
@@ -98,6 +115,15 @@ void run_experiments(uint no_nodes, string file, bool is_directed, bool is_rando
 						Constants::M = m;
 						Constants::DELTA = d;
 
+						/*Constants::NO_DENOISE_STEPS = 1;
+						Deterministic * de = new Deterministic(g);
+						double de_sol = de->get_solution();
+						sol_writefile << de_sol << ",";
+						query_writefile << de->get_no_queries() << ",";
+						cout << "de_" << m << "_" << d << ": " << de_sol << " " << de->get_no_queries() << endl;
+						delete de;*/
+
+						// test 10 times
 						Constants::NO_DENOISE_STEPS = 2;
 						Randomized * ra = new Randomized(g);
 						double ra_sol = ra->get_solution(false);
@@ -109,6 +135,20 @@ void run_experiments(uint no_nodes, string file, bool is_directed, bool is_rando
 					}
 				}
 
+				// greedy
+				/*Greedy * gr = new Greedy(g);
+				double gr_sol = gr->get_solution();
+				sol_writefile << gr_sol << ",";
+				cout << "greedy: " << gr_sol << endl;
+				delete gr;*/
+
+				/*for (int ii = 0; ii < 5; ++ii) {
+					StreamingGreedy * s_gr = new StreamingGreedy(g);
+					double s_gr_sol = s_gr->get_solution();
+					sol_writefile << s_gr_sol << ",";
+					cout << "streaming greedy: " << s_gr_sol << endl;
+					delete s_gr;
+				}*/
 
 				sol_writefile << endl;
 				query_writefile << endl;
@@ -135,7 +175,7 @@ void print_help() {
 		<< "-e <value of epsilon> # default: 0.5 for IM and 0 for sensor placement" << endl
 		<< "-n <value of eta - denoise step for RStream> # default: 2" << endl
 		<< "-g <value of gamma> # default: 1.0" << endl
-		<< "-a <algorithm, 0: DFS, 1: BFS, 2: BestFS>  # default: 2, please use SSA source code for testing IM algorithm" << endl
+		<< "-a <algorithm, 0: greedy, 1: DStream, 2: RStream, 3: SGr>  # default: 1, please use SSA source code for testing IM algorithm" << endl
 		<< "-p <number of threads to running algorithms> # default: 4" << endl;
 }
 
@@ -203,11 +243,17 @@ pair<string, int> parseArgs(int argc, char** argv) {
 					Constants::ALGORITHM = aBFS;
 					break;
 				case 2:
+					Constants::ALGORITHM = aIDS;
+					break;
+				case 3: 
+					Constants::ALGORITHM = aUCS;
+					break;
+				case 4:
 					Constants::ALGORITHM = abestFS;
 					break;
 				default:
-					Constants::ALGORITHM = abestFS;
-						break;
+					Constants::ALGORITHM = aDFS;
+					break;
 				}
 			}
 			else if (arg == "-p") {
@@ -228,6 +274,13 @@ pair<string, int> parseArgs(int argc, char** argv) {
 
 void run_command(string filename, int no_nodes) {
 	Network * g = new Network();
+	// bool r = false;
+	// if (Constants::DATA == Social) {
+	// 	r = g->read_network_from_file(no_nodes, filename, false);
+	// }
+	// else
+	// 	r = g->read_sensor_data(no_nodes, filename);
+
 	if (false) {
 		cout << "Wrong file, format or arguments" << endl;
 		print_help();
@@ -249,6 +302,18 @@ void run_command(string filename, int no_nodes) {
 				delete bfs;
 				break;
 			}
+			case aIDS: {
+				IDS *ids = new IDS(g);
+				ids->get_solution();
+				delete ids;
+				break;
+			}
+			case aUCS: {
+				UCS *ucs = new UCS(g);
+				ucs->get_solution();
+				delete ucs;
+				break;
+			}
 			case abestFS: {
 				bestFS *bestfs = new bestFS(g);
 				bestfs->get_solution();
@@ -256,12 +321,17 @@ void run_command(string filename, int no_nodes) {
 				break;
 			}
 			default: {
-				bestFS *bestfs = new bestFS(g);
-					bestfs->get_solution();
-					delete bestfs;
-					break;
+				Constants::NO_DENOISE_STEPS = 1;
+				Deterministic * de = new Deterministic(g);
+				sol = de->get_solution();
+				no_queries = de->get_no_queries();
+				delete de;
+				break;
 			}
 		}
+		// if (Constants::DATA == Sensor) sol = sol / 100;
+		// cout << "Output: " << sol << endl
+		// 	<< "Number of queries: " << no_queries << endl;
 	}
 	delete g;
 }
@@ -269,8 +339,12 @@ void run_command(string filename, int no_nodes) {
 
 int main(int argc, char* argv[]) {
 	srand(time(NULL));
+	//omp_set_num_threads(Constants::NUM_THREAD);
+	//run_experiments(4039, "facebook_combined.txt", false);
+	//run_experiments(58, "sensor.txt", false);
+	
 	pair<string, int> r = parseArgs(argc, argv);
-	if (r.first == "Error") {
+	if (r.first == "error") {
 		cout << "Wrong file, format or arguments" << endl;
 		print_help();
 	} else 

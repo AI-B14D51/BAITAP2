@@ -1,5 +1,6 @@
-BestFS
-Duong di ngan nhat tu 4 den 12 la
-4 9 11 8 12 
-Memory: VM: 6580 KB; RSS: 4201KB
-Duration time BFS: 1.24 miliseconds
+DFS
+Duong di ngan nhat tu 3 den 15 la:
+3=>0=>4=>9=>11=>12=>14=>15
+Do dai duong di la : 719
+Memory: VM: 7520 KB; RSS: 4788KB
+Duration time DFS: 3.572 miliseconds
