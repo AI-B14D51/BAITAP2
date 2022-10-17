@@ -1,17 +1,9 @@
 #include <string>
+#include<vector>
 #pragma once
 using namespace std;
-enum DATATYPE
-{
-	Social,
-	Sensor
-};
-enum ALG
-{
-	aDFS,
-	aBFS,
-	abestFS
-};
+enum DATATYPE { Social, Sensor };
+enum ALG {aDFS, aBFS, aIDS,aBestFS};
 
 class Constants
 {
@@ -26,11 +18,14 @@ public:
 	static int K;
 	static int M;
 	static double EPS;
-	static double DELTA;		 // for streaming algorithm
+	static double DELTA; // for streaming algorithm
 	static int NO_DENOISE_STEPS; // steps for eps' = 0 reach epsilon
 	static int start;
 	static int end;
 	static string FILEIN;
 	static int n_nodes;
 	static int limit;
+	static std::vector<int> cost_matrix;
 };
+
+
