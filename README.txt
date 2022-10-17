@@ -27,6 +27,6 @@ After building, to run our code, run:
 		-en end
 		-l  limit
 		-a  algorithm 0:dfs, 1:bfs, 2:ids
-
+ex: ./ksub -f input.in -V 20 -st 3 -en 11 -a 1 
 
 We conducted experiments on a Linux machine with 2.3Ghz Xeon 18 core processor and 256Gb of RAM. With 70 threads, DStream usually terminates after 20 minutes, RStream is 2 hours.
